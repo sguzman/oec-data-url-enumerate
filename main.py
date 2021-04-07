@@ -1,4 +1,5 @@
 from typing import List
+from typing import Tuple
 
 
 def quadf(alist, blist, clist, dlist, func):
@@ -61,14 +62,50 @@ def pci_url_hs6(a, b):
     return url
 
 
-def tarrifs_url(a, b, c, d):
+def tarrifs_url_hs2(a, b):
+    alist = list(b)
+
+    url: str = f'https://oec.world/olap-proxy/data?' \
+               f'HS2={a}&' \
+               f'Reporter+Country={alist[0]}&' \
+               f'Year=2020&' \
+               f'Partner+Country={alist[1]}&' \
+               f'cube=tariffs_i_wits_a_hs_new&' \
+               f'drilldowns=Year,HS2,Partner+Country,Reporter+Country,Agreement&' \
+               f'measures=Tariff&' \
+               f'parents=true&' \
+               f'sparse=true&' \
+               f'sort=Tariff.desc&' \
+               f'locale=en'
+
+    return url
+
+
+def tarrifs_url_hs4(a, b):
+    url: str = f'https://oec.world/olap-proxy/data?' \
+               f'HS4={a}&' \
+               f'Reporter+Country={b[0]}&' \
+               f'Year=2020&' \
+               f'Partner+Country={b[1]}&' \
+               f'cube=tariffs_i_wits_a_hs_new&' \
+               f'drilldowns=Year,HS4,Partner+Country,Reporter+Country,Agreement&' \
+               f'measures=Tariff&' \
+               f'parents=true&' \
+               f'sparse=true&' \
+               f'sort=Tariff.desc&' \
+               f'locale=en'
+
+    return url
+
+
+def tarrifs_url_hs6(a, b):
     url: str = f'https://oec.world/olap-proxy/data?' \
                f'HS6={a}&' \
-               f'Reporter+Country={b}&' \
-               f'Year={c}&' \
-               f'Partner+Country={d}&' \
+               f'Reporter+Country={b[0]}&' \
+               f'Year=2020&' \
+               f'Partner+Country={b[1]}&' \
                f'cube=tariffs_i_wits_a_hs_new&' \
-               f'drilldowns=Year,HS6,Partner+Country,Reporter+Country,Agreement&' \
+               f'drilldowns=Year,HS4,Partner+Country,Reporter+Country,Agreement&' \
                f'measures=Tariff&' \
                f'parents=true&' \
                f'sparse=true&' \
@@ -95,13 +132,19 @@ def main() -> None:
         'hs96'
     ]
 
+    hs2: List[str] = [s.removesuffix('\n') for s in open('./hs2.csv').readlines()]
     hs4: List[str] = [s.removesuffix('\n') for s in open('./hs4.csv').readlines()]
     hs6: List[str] = [s.removesuffix('\n') for s in open('./hs6.csv').readlines()]
     countries: List[str] = [s.removesuffix('\n') for s in open('./country-code.csv').readlines()]
 
+    partner = list(set(['|'.join([a, b]) for a in countries for b in countries if a != b]))
+    partner = [a.split('|') for a in partner]
+
     # 1
     for a in triplef(depth, rev, countries, eci_url):
         print(a)
+
+    # ---
 
     # 2
     for a in doublef(rev, hs4, pci_url_hs4):
@@ -109,6 +152,17 @@ def main() -> None:
 
     # 3
     for a in doublef(rev, hs6, pci_url_hs6):
+        print(a)
+
+    # ---
+
+    for a in doublef(hs2, partner, tarrifs_url_hs2):
+        print(a)
+
+    for a in doublef(hs4, partner, tarrifs_url_hs4):
+        print(a)
+
+    for a in doublef(hs6, partner, tarrifs_url_hs6):
         print(a)
 
 
