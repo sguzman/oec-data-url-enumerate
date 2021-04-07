@@ -39,6 +39,18 @@ def eci_url(a, b, c):
     return url
 
 
+def pci_url(a, b, c):
+    url: str = f'https://oec.world/olap-proxy/data.jsonrecords?' \
+               f'cube=complexity_pci_a_{b}_{a}&' \
+               f'Year={c}&' \
+               f'drilldowns=HS6,PCI+Rank,Year&' \
+               f'measures=PCI&' \
+               f'parents=true&' \
+               f'sparse=true'
+
+    return url
+
+
 def main() -> None:
     print('hi')
 
@@ -50,13 +62,15 @@ def main() -> None:
         'hs07',
     ]
 
-    years = range(1965, 2020)
+    years = range(1965, 2021)
     hs6: List[str] = open('./hs6.csv').readlines()
+    countries: List[str] = open('./country-code.csv').readlines()
 
     for a in triplef(depth, rev, years, eci_url):
         print(a)
 
-    for b
+    for a in triplef(depth, rev, years, pci_url):
+        print(a)
 
 
 if __name__ == '__main__':
